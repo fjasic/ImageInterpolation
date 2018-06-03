@@ -1,2 +1,3 @@
-# ImageInterpolation
-Projektni zadatak iz DSP2
+# ImageDSP
+
+Application for practising methods for image processing digital signal processing.
