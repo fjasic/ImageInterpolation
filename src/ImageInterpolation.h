@@ -18,8 +18,8 @@ void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output
 
 void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
 
-void imageSwirl(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double angle);
+void imageSwirl(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double k1, double k2);
 
-void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double angle);
+void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[], int m, int n,double k1,double k2);
 
 #endif // IMAGEINTERPOLATION_H_

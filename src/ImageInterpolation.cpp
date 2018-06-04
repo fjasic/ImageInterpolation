@@ -3,6 +3,9 @@
 #include <math.h>
 #include "ImageFilter.h"
 
+#define PI 3.141592653589793238462643383279502884L
+
+
 int divisibleByN(int sizeNum, int n) {
 	return sizeNum % n == 0 ? sizeNum : sizeNum + (n - (sizeNum % n));
 }
@@ -45,18 +48,7 @@ void sampleAndHold(const uchar input[], int xSize, int ySize, uchar output[], in
 		}
 	}
 
-	/*for (int i = 0; i < newXSize; i++)
-	{
-		for (int j = 0; j < newYSize; j++)
-		{
-			output[j * 3 * newXSize + i * 3]=output_RGB[j * 3 * newXSize + i * 3];
-			output[j * 3 * newXSize + i * 3 + 1]=output_RGB[j * 3 * newXSize + i * 3 + 1];
-			output[j * 3 * newXSize + i * 3 + 2]=output_RGB[j * 3 * newXSize + i * 3 + 2];
-		}
-	}
-
-	//Free resources
-	delete[]output_RGB;*/
+	
 }
 
 void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize)
@@ -200,12 +192,71 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 	}
 }
 
-void imageSwirl(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double k1)
+void imageSwirl(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double k1,double k2)
 {
 	/* TO DO */
+	uchar R, G, B;
+
+	for (int i = 0; i < xSize; i++) {
+		for (int j = 0; j < ySize; j++) {// i mi je X , j mi je Y ,ii mi je novoX ,jj mi je novoY
+			int ii = i + k1*xSize*sin((2*PI*j)/(ySize*k2));
+			int jj = j;
+			if (ii >= 0 && ii < xSize && jj >= 0 && jj < ySize) {
+				R = input[ii * 3 + jj * xSize * 3];
+				G = input[ii * 3 + 1 + jj * xSize * 3];
+				B = input[ii * 3 + 2 + jj * xSize * 3];
+				output[j * 3 * xSize + i * 3] = R;
+				output[j * 3 * xSize + i * 3 + 1] = G;
+				output[j * 3 * xSize + i * 3 + 2] = B;
+			}
+			else {
+				R = 0;
+				G = 0;
+				B = 0;
+				output[j * 3 * xSize + i * 3] = R;
+				output[j * 3 * xSize + i * 3 + 1] = G;
+				output[j * 3 * xSize + i * 3 + 2] = B;
+			}
+		}
+	}
 }
 
-void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double k1)
+void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double k1,double k2)
 {
 	/* TO DO */
+	uchar R, G, B;
+
+	for (int i = 0; i < xSize; i++) {
+		for (int j = 0; j < ySize; j++) {
+		
+
+			double di = i - m;
+			double dj = j - n;
+			int disI = i + k1*xSize*sin((2 * PI*j) / (ySize*k2));
+			int disJ = j;
+			int newI = floor(disI);
+			int newJ = floor(disJ);
+			double a = disJ - newJ;
+			double b = disI - newI;
+
+
+
+			if (newI >= 0 && (newI + 1) < xSize && newJ >= 0 && (newJ + 1) < ySize) {
+				R = (1 - a) * (1 - b) * input[newJ * xSize * 3 + newI * 3] + a * (1 - b) *input[(newJ + 1) * xSize * 3 + newI * 3] + (1 - a) * b * input[newJ* xSize * 3 + (newI + 1) * 3] + a * b * input[(newJ + 1)* xSize * 3 + (newI + 1) * 3];
+				G = (1 - a) * (1 - b) * input[newJ * xSize * 3 + 1 + newI * 3] + a * (1 - b) *input[(newJ + 1) * xSize * 3 + 1 + newI * 3] + (1 - a) * b * input[newJ* xSize * 3 + 1 + (newI + 1) * 3] + a * b * input[(newJ + 1)* xSize * 3 + 1 + (newI + 1) * 3];
+				B = (1 - a) * (1 - b) * input[newJ * xSize * 3 + 2 + newI * 3] + a * (1 - b) *input[(newJ + 1) * xSize * 3 + 2 + newI * 3] + (1 - a) * b * input[newJ* xSize * 3 + 2 + (newI + 1) * 3] + a * b * input[(newJ + 1)* xSize * 3 + 2 + (newI + 1) * 3];
+				output[j * 3 * xSize + i * 3] = R;
+				output[j * 3 * xSize + i * 3 + 1] = G;
+				output[j * 3 * xSize + i * 3 + 2] = B;
+			}
+			else {
+				R = 0;
+				G = 0;
+				B = 0;
+				output[j * 3 * xSize + i * 3] = R;
+				output[j * 3 * xSize + i * 3 + 1] = G;
+				output[j * 3 * xSize + i * 3 + 2] = B;
+			}
+		}
+	}
 }

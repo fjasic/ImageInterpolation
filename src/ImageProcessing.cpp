@@ -12,7 +12,7 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 	int X_SIZE_NEW;
 	int Y_SIZE_NEW;
 
-	/* NOTE: Calculate output image resolution and construct output image object */
+	/* NOTE: Calculate+6 output image resolution and construct output image object */
 
 	if (progName != "Swirl" && progName != "Swirl Bilinear") {
 		X_SIZE_NEW = divisibleByN(X_SIZE * params[1], 4);
@@ -69,7 +69,8 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 		/* TO DO: Construct output image object */
 
 		/* TO DO: Perform image rotation */
-	
+
+		imageSwirl(inImgs->bits(), X_SIZE, Y_SIZE, outImgs->bits(), X_SIZE / 2, Y_SIZE / 2, params[0],params[1]);
 	}
 	else if (progName == "Swirl Bilinear") 
 	{
@@ -80,6 +81,8 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 		/* TO DO: Construct output image object */
 
 		/* TO DO: Perform image rotation with bilinear interpolation */
+		imageSwirlBilinear(inImgs->bits(), X_SIZE, Y_SIZE, outImgs->bits(), X_SIZE / 2, Y_SIZE / 2, params[0], params[1]);
+
 	}
 
 }
