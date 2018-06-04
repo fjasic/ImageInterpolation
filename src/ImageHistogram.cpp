@@ -72,7 +72,7 @@ void modifySaturation(const uchar inputRGB[], const uchar inputY[], int xSize, i
 /*******************************************************************************************************************************/
 QImage createHistogramPlot(int histogram[], int start, int end)
 {
-	 QCustomPlot customPlot = QCustomPlot();
+	QCustomPlot customPlot;
 	 
 	 int vectorSize = end-start+1;
 	 int maxValue = 0;

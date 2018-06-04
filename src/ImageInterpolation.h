@@ -6,14 +6,20 @@
 #include <QVector>
 #include <QImage>
 
+int divisibleByN(int sizeNum, int n);
+
+uchar cubicInterpolate(uchar p[4], double x);
+
+char cubicInterpolate(char p[4], double x);
+
 void sampleAndHold(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
 
 void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
 
 void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
 
-void imageTransform(const uchar input[], int xSize, int ySize, uchar output[], double k1, double k2);
+void imageSwirl(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double angle);
 
-void imageTransformBilinear(const uchar input[], int xSize, int ySize, uchar output[], double k1, double k2);
+void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[], int m, int n, double angle);
 
 #endif // IMAGEINTERPOLATION_H_

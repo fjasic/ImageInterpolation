@@ -1,7 +1,7 @@
 
 #include "ParamItem.h"
 #include "ui_ParamItem.h"
-
+#include <QDoubleValidator>
 #include <QDebug>
 
 ParamItem::ParamItem(QWidget* parent)

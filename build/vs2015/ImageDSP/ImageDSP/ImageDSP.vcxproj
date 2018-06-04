@@ -72,6 +72,7 @@
     <ClCompile Include="..\..\..\..\src\HoverEditTriggerListView.cpp" />
     <ClCompile Include="..\..\..\..\src\ImageFIlter.cpp" />
     <ClCompile Include="..\..\..\..\src\ImageHistogram.cpp" />
+    <ClCompile Include="..\..\..\..\src\ImageInterpolation.cpp" />
     <ClCompile Include="..\..\..\..\src\ImageProcessing.cpp" />
     <ClCompile Include="..\..\..\..\src\ImageViewer.cpp" />
     <ClCompile Include="..\..\..\..\src\InImgItem.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="..\..\..\..\src\ColorSpaces.h" />
     <ClInclude Include="..\..\..\..\src\ImageFilter.h" />
     <ClInclude Include="..\..\..\..\src\ImageHistogram.h" />
+    <ClInclude Include="..\..\..\..\src\ImageInterpolation.h" />
     <ClInclude Include="..\..\..\..\src\ImageProcessing.h" />
     <ClInclude Include="..\..\..\..\src\NxNDCT.h" />
     <ClInclude Include="..\..\..\..\src\DCT.h" />
