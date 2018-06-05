@@ -87,24 +87,43 @@ void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output
 	}
 }
 
+double wHelperFcn(double d) {
+	if (abs(d) < 1) {
+		return 1.5 * pow(abs(d), 3) - 2.5 * d * d + 1;
+	}
+	else if ((abs(d) >= 1) && (abs(d) < 2)) {
+		return -0.5 * pow(abs(d), 3) + 2.5 * d * d - 4 * abs(d) + 2;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 /* A help function for bicubic interpolation. Works for unsigned char */
 uchar cubicInterpolate(uchar p[4], double x) {
-	return p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])));
-}
+	double w[4];
+	int ret = 0;
 
-/* A help function for bicubic interpolation. Works for signed chars*/
-char cubicInterpolate(char p[4], double x) {
-	int retVal = p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])));
+	w[0] = wHelperFcn(x + 1);
+	w[1] = wHelperFcn(x);
+	w[2] = wHelperFcn(1 - x);
+	w[3] = wHelperFcn(2 - x);
 
-	if (retVal > 127) {
-		retVal = 127;
-	}
-	else if (retVal < -127) {
-		retVal = -127;
+	for (int i = 0; i < 4; i++) {
+		ret += p[i] * w[i];
 	}
 
-	return (char)retVal;
+	if (ret > 255) {
+		ret = 255;
+	}
+	else  if (ret < 0) {
+		ret = 0;
+	}
+
+	return (uchar)ret;
 }
+
 
 void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize)
 {
@@ -116,11 +135,11 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 	uchar *R_buff = new uchar[xSize * ySize];
 	uchar *G_buff = new uchar[xSize * ySize];
 
-	for (int i = 0; i < xSize; i++) {
-		for (int j = 0; j < ySize; j+=3) { 
-			R_buff[j * xSize + i] =  input[j * xSize + i];
-			G_buff[j  * xSize + i + 1] = input[j * xSize + i + 1];
-			B_buff[j  * xSize + i + 2] = input[j * xSize + i + 2];
+	for (int i =0; i < xSize; i++) {
+		for (int j = 0; j < ySize; j++) { 
+			R_buff[j * xSize + i] =  input[j*3 * xSize + 3*i];
+			G_buff[j  * xSize + i + 1] = input[3*j * xSize + 3*i + 1];
+			B_buff[j  * xSize + i + 2] = input[3*j * xSize + 3*i + 2];
 		}
 	}
 	uchar *R_output = new uchar[newXSize * newYSize];
@@ -179,11 +198,14 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 				R_vertical[v] = cubicInterpolate(R_horizontal, b);
 				G_vertical[v] = cubicInterpolate(G_horizontal, b);
 				B_vertical[v] = cubicInterpolate(B_horizontal, b);
-			}
 
+		
+			}
 			R = cubicInterpolate(R_vertical, a);
 			G = cubicInterpolate(G_vertical, a);
 			B = cubicInterpolate(B_vertical, a);
+
+			
 
 			output[j * 3 * newXSize + i * 3] = R;
 			output[j * 3 * newXSize + i * 3 + 1] = G;

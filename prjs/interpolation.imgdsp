@@ -22,14 +22,14 @@
         </program>
         <program name="Swirl">
             <params>
-                <param name="k1:" min="0" current="0.5" max="1"/>
-                <param name="k2:" min="0" current="0.5" max="1"/>
+                <param name="k1:" min="-1" current="0.5" max="1"/>
+                <param name="k2:" min="-1" current="0.5" max="1"/>
             </params>
         </program>
         <program name="Swirl Bilinear">
             <params>
-                <param name="k1:" min="0" current="0.5" max="1"/>
-                <param name="k2:" min="0" current="0.5" max="1"/>
+                <param name="k1:" min="-1" current="0.5" max="1"/>
+                <param name="k2:" min="-1" current="0.5" max="1"/>
             </params>
         </program>
     </programs>

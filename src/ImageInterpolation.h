@@ -10,8 +10,6 @@ int divisibleByN(int sizeNum, int n);
 
 uchar cubicInterpolate(uchar p[4], double x);
 
-char cubicInterpolate(char p[4], double x);
-
 void sampleAndHold(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
 
 void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output[], int newXSize, int newYSize);
