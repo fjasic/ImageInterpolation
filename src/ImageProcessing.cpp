@@ -14,7 +14,7 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 
 	/* NOTE: Calculate+6 output image resolution and construct output image object */
 
-	if (progName != "Swirl" && progName != "Swirl Bilinear") {
+	if (progName != "Waves-V/L" && progName != "Waves-V/L Bilinear") {
 		X_SIZE_NEW = divisibleByN(X_SIZE * params[1], 4);
 		Y_SIZE_NEW = divisibleByN(Y_SIZE * params[0], 4);
 
@@ -60,7 +60,7 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 
 		bicubicInterpolate(inImgs->bits(), X_SIZE, Y_SIZE, outImgs->bits(), X_SIZE_NEW, Y_SIZE_NEW);
 	}
-	else if(progName == "Swirl") 
+	else if(progName == "Waves-V/L") 
 	{	
 		/* Input image data in RGB format can be obtained with inImgs->bits() */
 		/* k1 factor is params[0]*/
@@ -72,7 +72,7 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 
 		imageSwirl(inImgs->bits(), X_SIZE, Y_SIZE, outImgs->bits(), X_SIZE / 2, Y_SIZE / 2, params[0],params[1]);
 	}
-	else if (progName == "Swirl Bilinear") 
+	else if (progName == "Waves-V/L Bilinear") 
 	{
 		/* Input image data in RGB format can be obtained with inImgs->bits() */
 		/* k1 factor is params[0]*/

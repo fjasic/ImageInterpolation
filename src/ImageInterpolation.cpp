@@ -2,7 +2,7 @@
 #include "ColorSpaces.h"
 #include <math.h>
 #include "ImageFilter.h"
-
+#include "NxNDCT.h"
 #define PI 3.141592653589793238462643383279502884L
 
 
@@ -87,7 +87,7 @@ void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output
 	}
 }
 
-double wHelperFcn(double d) {
+double helperFcn(double d) {
 	if (abs(d) < 1) {
 		return 1.5 * pow(abs(d), 3) - 2.5 * d * d + 1;
 	}
@@ -105,10 +105,10 @@ uchar cubicInterpolate(uchar p[4], double x) {
 	double w[4];
 	int ret = 0;
 
-	w[0] = wHelperFcn(x + 1);
-	w[1] = wHelperFcn(x);
-	w[2] = wHelperFcn(1 - x);
-	w[3] = wHelperFcn(2 - x);
+	w[0] = helperFcn(x + 1);
+	w[1] = helperFcn(x);
+	w[2] = helperFcn(1 - x);
+	w[3] = helperFcn(2 - x);
 
 	for (int i = 0; i < 4; i++) {
 		ret += p[i] * w[i];
@@ -129,8 +129,7 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 {
 	/* TO DO */
 	uchar R, G, B;
-
-
+	uchar *output_buffer;
 	uchar *B_buff = new uchar[xSize * ySize];
 	uchar *R_buff = new uchar[xSize * ySize];
 	uchar *G_buff = new uchar[xSize * ySize];
@@ -138,10 +137,11 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 	for (int i =0; i < xSize; i++) {
 		for (int j = 0; j < ySize; j++) { 
 			R_buff[j * xSize + i] =  input[j*3 * xSize + 3*i];
-			G_buff[j  * xSize + i + 1] = input[3*j * xSize + 3*i + 1];
-			B_buff[j  * xSize + i + 2] = input[3*j * xSize + 3*i + 2];
+			G_buff[j * xSize + i + 1] = input[3*j * xSize + 3*i + 1];
+			B_buff[j * xSize + i + 2] = input[3*j * xSize + 3*i + 2];
 		}
 	}
+
 	uchar *R_output = new uchar[newXSize * newYSize];
 	uchar *G_output = new uchar[newXSize * newYSize];
 	uchar *B_output = new uchar[newXSize * newYSize];
@@ -156,60 +156,55 @@ void bicubicInterpolate(const uchar input[], int xSize, int ySize, uchar output[
 	uchar *B_vertical = new uchar[4];
 
 	//Scaling factors
-	const double F_horizontal = (double)newXSize / xSize;
-	const double F_vertical = (double)newYSize / ySize;
+	 double F_horizontal = (double)newXSize / xSize;
+	 double F_vertical = (double)newYSize / ySize;
 
 	//Extended buffers for correct pixel calculation
 	uchar *R_extnd = new uchar[(xSize + 4) * (ySize + 4)];
 	uchar *G_extnd = new uchar[(xSize + 4) * (ySize + 4)];
 	uchar *B_extnd = new uchar[(xSize + 4) * (ySize + 4)];
-
 	extendBorders(R_buff, xSize, ySize, R_extnd, 2);
 	extendBorders(G_buff, xSize, ySize, G_extnd, 2);
 	extendBorders(B_buff, xSize, ySize, B_extnd, 2);
 
-
-
-	for (int i = 0; i < newXSize; i++) {
-		for (int j = 0; j < newYSize; j++) {
-			double b = i / F_horizontal - floor(i / F_horizontal);
-			double a = j / F_vertical - floor(j / F_vertical);
+	for (int i = 0; i < newXSize-1; ++i) {
+		for (int j = 0; j < newYSize-1; j++) {
+			double a = abs(j / F_vertical - floor(j / F_vertical));
+			double b = abs(i / F_horizontal - floor(i / F_horizontal));
 
 			int new_x = j / F_vertical;
 			int new_y = i / F_horizontal;
 
 			int v = 0;
 			for (int h = new_x - 1; h < new_x + 3; h++, v++) {
-				R_horizontal[0] = R_extnd[h * (ySize + 4) + new_y - 1];
-				R_horizontal[1] = R_extnd[h * (ySize + 4) + new_y];
-				R_horizontal[2] = R_extnd[h * (ySize + 4) + new_y + 1];
-				R_horizontal[3] = R_extnd[h * (ySize + 4) + new_y + 2];
+				R_horizontal[0] = R_extnd[h * (ySize + 4) + 4  + new_y - 1];
+				R_horizontal[1] = R_extnd[h * (ySize + 4) + 4 + new_y];
+				R_horizontal[2] = R_extnd[h * (ySize + 4) + 4 + new_y + 1];
+				R_horizontal[3] = R_extnd[h * (ySize + 4) + 4 + new_y + 2];
 
-				G_horizontal[0] = G_extnd[h * (ySize + 4) + new_y - 1];
-				G_horizontal[1] = G_extnd[h * (ySize + 4) + new_y];
-				G_horizontal[2] = G_extnd[h * (ySize + 4) + new_y + 1];
-				G_horizontal[3] = G_extnd[h * (ySize + 4) + new_y + 2];
+				G_horizontal[0] = G_extnd[h * (ySize + 4) + 4 + new_y - 1];
+				G_horizontal[1] = G_extnd[h * (ySize + 4) + 4 + new_y];
+				G_horizontal[2] = G_extnd[h * (ySize + 4) + 4 + new_y + 1];
+				G_horizontal[3] = G_extnd[h * (ySize + 4) + 4 + new_y + 2];
 
-				B_horizontal[0] = B_extnd[h * (ySize + 4) + new_y - 1];
-				B_horizontal[1] = B_extnd[h * (ySize + 4) + new_y];
-				B_horizontal[2] = B_extnd[h * (ySize + 4) + new_y + 1];
-				B_horizontal[3] = B_extnd[h * (ySize + 4) + new_y + 2];
+				B_horizontal[0] = B_extnd[h * (ySize + 4) + 4 + new_y - 1];
+				B_horizontal[1] = B_extnd[h * (ySize + 4) + 4 + new_y];
+				B_horizontal[2] = B_extnd[h * (ySize + 4) + 4 + new_y + 1];
+				B_horizontal[3] = B_extnd[h * (ySize + 4) + 4 + new_y + 2];
 
 				R_vertical[v] = cubicInterpolate(R_horizontal, b);
 				G_vertical[v] = cubicInterpolate(G_horizontal, b);
 				B_vertical[v] = cubicInterpolate(B_horizontal, b);
 
-		
 			}
 			R = cubicInterpolate(R_vertical, a);
 			G = cubicInterpolate(G_vertical, a);
 			B = cubicInterpolate(B_vertical, a);
 
-			
-
 			output[j * 3 * newXSize + i * 3] = R;
 			output[j * 3 * newXSize + i * 3 + 1] = G;
 			output[j * 3 * newXSize + i * 3 + 2] = B;
+
 		}
 	}
 }
@@ -251,7 +246,6 @@ void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[
 	for (int i = 0; i < xSize; i++) {
 		for (int j = 0; j < ySize; j++) {
 		
-
 			double di = i - m;
 			double dj = j - n;
 			int disI = i + k1*xSize*sin((2 * PI*j) / (ySize*k2));
@@ -260,8 +254,6 @@ void imageSwirlBilinear(const uchar input[], int xSize, int ySize, uchar output[
 			int newJ = floor(disJ);
 			double a = disJ - newJ;
 			double b = disI - newI;
-
-
 
 			if (newI >= 0 && (newI + 1) < xSize && newJ >= 0 && (newJ + 1) < ySize) {
 				R = (1 - a) * (1 - b) * input[newJ * xSize * 3 + newI * 3] + a * (1 - b) *input[(newJ + 1) * xSize * 3 + newI * 3] + (1 - a) * b * input[newJ* xSize * 3 + (newI + 1) * 3] + a * b * input[(newJ + 1)* xSize * 3 + (newI + 1) * 3];
